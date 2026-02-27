@@ -687,7 +687,7 @@ int file_alloc_load(const char *file_path, uint8_t **buf, unsigned int *size)
         return -1;
     }
 
-    ret = sysFsFStat(fd, &status);
+    ret = sysFsFstat(fd, &status);
     if (ret != 0)
     {
         LOG(lm_main, LOG_ERROR, ("file %s get stat error : 0x%x\n", file_path, ret));

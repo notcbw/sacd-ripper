@@ -33,6 +33,8 @@
 
 #include <sysmodule/sysmodule.h>
 
+#include <ppu-lv2.h>
+
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <sys/thread.h>
@@ -325,8 +327,6 @@ int unpatch_lv1_ss_services(void)
 
 int patch_syscall_864(void)
 {
-	if(c_firmware>4.81f) return -1;
-
 	uint64_t addr;
 	if(deh_mode)
 	{
@@ -388,6 +388,8 @@ int patch_syscall_864(void)
 			addr = 0x80000000002ECAD0ULL;
 		else if(c_firmware==4.80f)
 			addr = 0x80000000002ECAC0ULL;
+        else if(c_firmware>=4.91f)
+			addr = 0x80000000002ECAB0ULL;
 		else if(c_firmware==3.41f)
 			addr = 0x80000000002CF880ULL; // fw 3.41
 		else return -1;
@@ -719,6 +721,13 @@ int user_select_server_mode(void)
     return dialog_action != 2;
 }
 
+u64 get_fw_version()
+{
+    u64 ver;
+    lv2syscall1(375, &ver);
+    return ver;
+}
+
 int main(int argc, char *argv[])
 {
     int     ret, server_mode;
@@ -754,69 +763,74 @@ int main(int argc, char *argv[])
     if (user_requested_exit())
         goto quit;
 
-	u64 CEX=0x4345580000000000ULL;
+
+    // get system version in float
+    u64 ver = get_fw_version();
+    c_firmware = (float)((double)ver / 10000.0);
+
+    u64 CEX=0x4345580000000000ULL;
 	u64 DEX=0x4445580000000000ULL;
 	u64 DEH=0x4445480000000000ULL;
 
-	if(lv2peek(0x80000000002E79C8ULL)==DEX) {dex_mode=2; c_firmware=3.41f;}
+    if(lv2peek(0x80000000002ECAB0ULL)==CEX) {dex_mode=0; }
+    else
+	if(lv2peek(0x80000000002E79C8ULL)==DEX) {dex_mode=2; }
 	else
-	if(lv2peek(0x80000000002CFF98ULL)==CEX) {dex_mode=0; c_firmware=3.41f;}
+	if(lv2peek(0x80000000002CFF98ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x80000000002EFE20ULL)==DEX) {dex_mode=2; c_firmware=3.55f;}
+	if(lv2peek(0x80000000002EFE20ULL)==DEX) {dex_mode=2; }
 	else
-	if(lv2peek(0x80000000002D83D0ULL)==CEX) {dex_mode=0; c_firmware=3.55f;}
+	if(lv2peek(0x80000000002D83D0ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x8000000000302D88ULL)==DEX) {dex_mode=2; c_firmware=4.21f;}
+	if(lv2peek(0x8000000000302D88ULL)==DEX) {dex_mode=2; }
 	else
-	if(lv2peek(0x80000000002E8610ULL)==CEX) {dex_mode=0; c_firmware=4.21f;}
+	if(lv2peek(0x80000000002E8610ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x80000000002E9F08ULL)==CEX) {dex_mode=0; c_firmware=4.30f;}
+	if(lv2peek(0x80000000002E9F08ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x8000000000304630ULL)==DEX) {dex_mode=2; c_firmware=4.30f;}
+	if(lv2peek(0x8000000000304630ULL)==DEX) {dex_mode=2; }
 	else
-	if(lv2peek(0x80000000002E9F18ULL)==CEX) {dex_mode=0; c_firmware=4.31f;}
+	if(lv2peek(0x80000000002E9F18ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x80000000002EA488ULL)==CEX) {dex_mode=0; c_firmware=4.40f;}
+	if(lv2peek(0x80000000002EA488ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x80000000002EA498ULL)==CEX) {dex_mode=0; c_firmware=4.41f;}
+	if(lv2peek(0x80000000002EA498ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x8000000000304EF0ULL)==DEX) {dex_mode=2; c_firmware=4.41f;}
+	if(lv2peek(0x8000000000304EF0ULL)==DEX) {dex_mode=2; }
 	else
-	if(lv2peek(0x80000000002EA9B8ULL)==CEX) {dex_mode=0; c_firmware=4.46f;}
+	if(lv2peek(0x80000000002EA9B8ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x8000000000305410ULL)==DEX) {dex_mode=2; c_firmware=4.46f;}
+	if(lv2peek(0x8000000000305410ULL)==DEX) {dex_mode=2; }
 	else
-	if(lv2peek(0x80000000002E9BE0ULL)==CEX) {dex_mode=0; c_firmware=4.50f;}
+	if(lv2peek(0x80000000002E9BE0ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x8000000000309698ULL)==DEX) {dex_mode=2; c_firmware=4.50f;}
+	if(lv2peek(0x8000000000309698ULL)==DEX) {dex_mode=2; }
 	else
-	if(lv2peek(0x80000000002E9D70ULL)==CEX) {dex_mode=0; c_firmware=4.53f;}
+	if(lv2peek(0x80000000002E9D70ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x80000000002EC5E0ULL)==CEX) {dex_mode=0; c_firmware=4.55f;}
+	if(lv2peek(0x80000000002EC5E0ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x80000000002ED850ULL)==CEX) {dex_mode=0; c_firmware=4.60f;}
+	if(lv2peek(0x80000000002ED850ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x80000000002ED860ULL)==CEX) {dex_mode=0; c_firmware=4.65f;}
+	if(lv2peek(0x80000000002ED860ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x800000000030F1A8ULL)==DEX) {dex_mode=2; c_firmware=4.65f;}
+	if(lv2peek(0x800000000030F1A8ULL)==DEX) {dex_mode=2; }
 	else
-	if(lv2peek(0x80000000002ED778ULL)==CEX) {dex_mode=0; c_firmware=4.70f;}
+	if(lv2peek(0x80000000002ED778ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x800000000030F240ULL)==DEX) {dex_mode=2; c_firmware=4.70f;}
+	if(lv2peek(0x800000000030F240ULL)==DEX) {dex_mode=2; }
 	else
-	if(lv2peek(0x80000000002ED818ULL)==CEX) {dex_mode=0; c_firmware=4.75f;}
+	if(lv2peek(0x80000000002ED818ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x800000000030F2D0ULL)==DEX) {dex_mode=2; c_firmware=4.75f;}
+	if(lv2peek(0x800000000030F2D0ULL)==DEX) {dex_mode=2; }
 	else
-	if(lv2peek(0x80000000002ED808ULL)==CEX) {dex_mode=0; c_firmware=4.80f;}
+	if(lv2peek(0x80000000002ED808ULL)==CEX) {dex_mode=0; }
 	else
-	if(lv2peek(0x800000000030F3A0ULL)==DEX) {dex_mode=2; c_firmware=4.80f;}
+	if(lv2peek(0x800000000030F3A0ULL)==DEX) {dex_mode=2; }
 	else
-	if(lv2peek(0x800000000030F3B0ULL)==DEX) {dex_mode=2; c_firmware=4.81f;}
+	if(lv2peek(0x800000000030F3B0ULL)==DEX) {dex_mode=2; }
 	else
-	if(lv2peek(0x800000000032EB60ULL)==DEH) {deh_mode=2; c_firmware=4.81f;}
-	else	
-		c_firmware=0.00f;
+	if(lv2peek(0x800000000032EB60ULL)==DEH) {deh_mode=2; }
 
 	if(c_firmware==3.55f && dex_mode)
 	{
@@ -931,6 +945,16 @@ int main(int argc, char *argv[])
 	if(c_firmware==4.81f && dex_mode)
 	{
 		SYSCALL_TABLE			= SYSCALL_TABLE_481D;
+	}
+    else
+    if(c_firmware==4.91f && !dex_mode)
+	{
+		SYSCALL_TABLE			= SYSCALL_TABLE_492;
+	}
+	else
+    if(c_firmware==4.92f && !dex_mode)
+	{
+		SYSCALL_TABLE			= SYSCALL_TABLE_492;
 	}
 	else
 	if(c_firmware==4.46f && dex_mode)

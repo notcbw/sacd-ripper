@@ -136,7 +136,7 @@ int create_sac_accessor(void)
     memset(&mutex_attr, 0, sizeof(sys_mutex_attr_t));
     mutex_attr.attr_protocol  = SYS_MUTEX_PROTOCOL_PRIO;
     mutex_attr.attr_recursive = SYS_MUTEX_ATTR_NOT_RECURSIVE;
-    mutex_attr.attr_pshared   = SYS_MUTEX_ATTR_PSHARED;
+    mutex_attr.attr_pshared   = SYS_MUTEX_ATTR_NOT_PSHARED;
     mutex_attr.attr_adaptive  = SYS_MUTEX_ATTR_NOT_ADAPTIVE;
 
     if (sysMutexCreate(&sa->mmio_mutex, &mutex_attr) != 0)

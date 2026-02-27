@@ -127,8 +127,8 @@ static int dst_decoder_thread_create(dst_decoder_thread_t decoder, int spu_id, s
     }
     
     memset(&group_attr, 0, sizeof(sysSpuThreadGroupAttribute));
-    group_attr.nameSize = 6 + 1;
-    group_attr.nameAddress = (uint64_t)((void*)("DSTGRP"));
+    group_attr.nsize = 6 + 1;
+    group_attr.name = (uint64_t)((void*)("DSTGRP"));
     ret = sysSpuThreadGroupCreate(&decoder->spu_group, 
                                   1, // 1 SPU per group
                                   PRIORITY, 
@@ -154,9 +154,9 @@ static int dst_decoder_thread_create(dst_decoder_thread_t decoder, int spu_id, s
     thread_args.arg0 = ((uint64_t)(DST_QUEUE_NUMBER)) << 32;
 
     memset(&thread_attr, 0, sizeof(sysSpuThreadAttribute));
-    thread_attr.nameSize = 6 + 1;
-    thread_attr.nameAddress = (uint64_t)((void*)("DSTTHR"));
-    thread_attr.attribute = SPU_THREAD_ATTR_NONE;
+    thread_attr.nsize = 6 + 1;
+    thread_attr.name = (uint64_t)((void*)("DSTTHR"));
+    thread_attr.option = SPU_THREAD_ATTR_NONE;
 
     ret = sysSpuThreadInitialize(&decoder->spu_thread,
                                  decoder->spu_group,
